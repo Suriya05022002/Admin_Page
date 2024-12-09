@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Management</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        /* Sidebar styles */
+        .sidebar {
+            width: 290px;
+            height: 100vh;
+            background-color: #6f42c1;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .logo-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 2rem;
+            background-color: #fff;
+            color: #6f42c1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .brand-name {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .menu-item:hover {
+            background-color: #5a36a3;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .menu-item span {
+            flex: 1;
+        }
+
+        .submenu {
+            display: none;
+            flex-direction: column;
+            margin-left: 20px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item {
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .submenu-item:hover {
+            color: #fff;
+        }
+
+        .has-submenu {
+            cursor: pointer;
+        }
+
+        .submenu.show {
+            display: flex;
+        }
+
+        .bottom-icon {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .bottom-icon i {
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .bottom-icon i:hover {
+            color: #ddd;
+        }
+
+        /* Main content styles */
+        .main-content {
+            margin-left: 290px;
+            padding: 20px;
+            width: calc(100% - 290px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+           
+        }
+
+        .title {
+            font-size: 1.5rem;
+            color: #1a1a1a;
+           
+        }
+
+        .add-btn {
+            background: #5b21b6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            
+            border-radius: 0.375rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .add-btn:hover {
+            background: #4c1d95;
+        }
+
+        /* Table controls */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .entries-control {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .search-control input {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.375rem;
+            width: 200px;
+        }
+
+        /* Table styles */
+        .table-container {
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        /* Department head column */
+        .dept-head {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Actions column */
+        .actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .edit-btn:hover {
+            color: #2563eb;
+        }
+
+        .delete-btn:hover {
+            color: #dc2626;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            background: #f3f4f6;
+        }
+
+        .page-btn.active {
+            background: #5b21b6;
+            color: white;
+            border-color: #5b21b6;
+        }
+
+      /* Add Department Form */
+/* Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    width: 400px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    position: relative;
+}
+
+/* Modal Header */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+.modal-header h3 {
+    font-size: 18px;
+    color: #5b21b6;
+    margin: 0;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.close-btn:hover {
+    color: #5b21b6;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.submit-btn {
+    background: #5b21b6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background: #4c1d95;
+}
+
+/* Show Modal */
+.modal-overlay.show {
+    visibility: visible;
+    opacity: 1;
+}
+
+
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        tr {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+
+        /* Responsive design */
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            color: black;
+            background-color: white;
+            padding: 5px 8px;
+            border-radius: 5px;
+        }
+
+        .close-icon {
+            display: none;
+            font-size: 1.8rem;
+            color: #ffffff;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 80%;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            body.sidebar-open {
+                overflow: hidden;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+
+            .table-controls {
+                flex-direction: column;
+            }
+
+            .search-control input {
+                width: 100%;
+            }
+
+            th, td {
+                padding: 0.75rem;
+            }
+
+            .dept-head {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.25rem;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            
+
+            .main-content {
+                padding: 10px;
+            }
+
+            .title {
+                font-size: 1.2rem;
+                padding-bottom: 30px;
+                padding-left: 90px;
+            }
+
+            .add-btn {
+                width: 90%;
+                justify-content: center;
+            }
+
+            .table-container {
+          
+                border-radius: 0;
+            }
+
+            table {
+                font-size: 0.8rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            .avatar {
+                width: 2rem;
+                height: 2rem;
+            }
+
+            .actions {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .pagination {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .page-controls {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <div class="sidebar" id="sidebar">
+        <div class="close-icon" id="closeIcon">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="logo-section">
+            <div class="logo">
+                <i class="fas fa-clipboard"></i>
+            </div>
+            <h2 class="brand-name">My-Task</h2>
+        </div>
+        <nav class="menu">
+            <a href="#" class="menu-item"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-briefcase"></i> <span>Projects</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-users"></i> <span>Our Clients</span></a>
+            <a href="#" class="menu-item has-submenu">
+                <i class="fas fa-user"></i> <span>Employees</span>
+                <i class="fas fa-chevron-down submenu-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="index.html" class="submenu-item" onclick="toggleMenu()">Members</a>
+                <a href="profile.html" class="submenu-item" onclick="toggleMenu()">Members Profile</a>
+                <a href="attandance.html" class="submenu-item" onclick="toggleMenu()">Attendance</a>
+                <a href="Leave .html" class="submenu-item" onclick="toggleMenu()">Leave Request</a>
+                <a href="Department.html" class="submenu-item" onclick="toggleMenu()">Department</a>
+                <a href="salary.html" class="submenu-item" onclick="toggleMenu()">Salary</a>
+            </div>
+            <a href="#" class="menu-item"><i class="fas fa-book"></i> <span>Accounts</span></a>
+            <a href="#" class="menu-item"><i class="fas fa-dollar-sign"></i> <span>Payroll</span></a>
+        </nav>
+        <div class="bottom-icon">
+            <i class="fas fa-ellipsis-h"></i>
+        </div>
+    </div>
+           
+    <div class="main-content">
+        <div class="header">
+            <h1 class="title" >Departments</h1>
+            <button class="add-btn" id="addDepartmentBtn">
+                <i class="fas fa-plus"></i>
+                Add Departments
+            </button>
+        </div>
+
+      <!-- Add Department Modal -->
+<div class="modal-overlay" id="addDepartmentModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Add Department</h3>
+            <button class="close-btn" id="closeModal">&times;</button>
+        </div>
+        <form id="addDepartmentForm">
+            <div class="form-group">
+                <label for="departmentName">Department Name:</label>
+                <input type="text" id="departmentName" placeholder="Enter department name" required>
+            </div>
+            <div class="form-group">
+                <label for="departmentHead">Department Head:</label>
+                <input type="text" id="departmentHead" placeholder="Enter department head" required>
+            </div>
+            <div class="form-group">
+                <label for="employeeUnderwork">Employee Underwork:</label>
+                <input type="number" id="employeeUnderwork" placeholder="Enter number of employees" required>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="submit-btn" id="submitDepartment">Add Department</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+        <div class="table-controls">
+            <div class="entries-control">
+                Show 
+                <select>
+                    <option>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                </select>
+                entries
+            </div>
+            <div class="search-control">
+                <input type="search" placeholder="Search...">
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>DEPARTMENT HEAD</th>
+                        <th>DEPARTMENT NAME</th>
+                        <th>EMPLOYEE UNDERWORK</th>
+                        <th>ACTIONS</th>
+                    </tr>
+                </thead>
+                <tbody id="departmentTableBody">
+                    <tr>
+                        <td>1</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=1" alt="Joan Dyer">
+                                </div>
+                                Joan Dyer
+                            </div>
+                        </td>
+                        <td>Web Development</td>
+                        <td>40</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(1)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(1)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=2" alt="Ryan Randall">
+                                </div>
+                                Ryan Randall
+                            </div>
+                        </td>
+                        <td>Accounts</td>
+                        <td>48</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(2)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(2)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=3" alt="Phil Glover">
+                                </div>
+                                Phil Glover
+                            </div>
+                        </td>
+                        <td>Support</td>
+                        <td>15</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(3)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(3)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=4" alt="Victor Rampling">
+                                </div>
+                                Victor Rampling
+                            </div>
+                        </td>
+                        <td>App Development</td>
+                        <td>39</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(4)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(4)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=5" alt="Sally Graham">
+                                </div>
+                                Sally Graham
+                            </div>
+                        </td>
+                        <td>Recruiter</td>
+                        <td>12</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(5)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(5)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td>
+                            <div class="dept-head">
+                                <div class="avatar">
+                                    <img src="https://i.pravatar.cc/50?img=6" alt="Robert Anderson">
+                                </div>
+                                Robert Anderson
+                            </div>
+                        </td>
+                        <td>Admin</td>
+                        <td>8</td>
+                        <td>
+                            <div class="actions">
+                                <button class="action-btn edit-btn" onclick="editDepartment(6)">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="action-btn delete-btn" onclick="deleteDepartment(6)">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="pagination">
+                <span>Showing 1 to 6 of 6 entries</span>
+                <div class="page-controls">
+                    <button class="page-btn">Previous</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeIcon = document.getElementById('closeIcon');
+        const body = document.body;
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            body.classList.toggle('sidebar-open');
+            closeIcon.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+
+        hamburger.addEventListener('click', toggleSidebar);
+        closeIcon.addEventListener('click', toggleSidebar);
+
+        // Submenu functionality
+        document.querySelectorAll('.has-submenu').forEach(menuItem => {
+            menuItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                const submenu = menuItem.nextElementSibling;
+                submenu.classList.toggle('show');
+            });
+        });
+
+        // Search functionality
+        document.querySelector('.search-control input').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#departmentTableBody tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Add Department functionality
+      // JavaScript for Modal Functionality
+const addDepartmentModal = document.getElementById("addDepartmentModal");
+const closeModal = document.getElementById("closeModal");
+const addDepartmentBtn = document.getElementById("addDepartmentBtn");
+const submitDepartment = document.getElementById("submitDepartment");
+
+addDepartmentBtn.addEventListener("click", () => {
+    addDepartmentModal.classList.add("show");
+});
+
+closeModal.addEventListener("click", () => {
+    addDepartmentModal.classList.remove("show");
+});
+
+submitDepartment.addEventListener("click", () => {
+    const departmentName = document.getElementById("departmentName").value;
+    const departmentHead = document.getElementById("departmentHead").value;
+    const employeeUnderwork = document.getElementById("employeeUnderwork").value;
+
+    if (departmentName && departmentHead && employeeUnderwork) {
+        alert("Department Added Successfully!");
+        addDepartmentModal.classList.remove("show");
+        document.getElementById("addDepartmentForm").reset();
+    } else {
+        alert("Please fill out all fields!");
+    }
+});
+
+
+        // Edit department function
+        function editDepartment(id) {
+            console.log('Edit department:', id);
+            // Add your edit logic here
+        }
+
+        // Delete department function
+        function deleteDepartment(id) {
+            const row = document.querySelector(`#departmentTableBody tr:nth-child(${id})`);
+            if (row) {
+                row.style.animation = 'fadeOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    row.remove();
+                    // Update the remaining row numbers
+                    document.querySelectorAll('#departmentTableBody tr').forEach((row, index) => {
+                        row.firstElementChild.textContent = index + 1;
+                    });
+                    updatePagination();
+                }, 300);
+            }
+        }
+    </script>
+</body>
+</html>

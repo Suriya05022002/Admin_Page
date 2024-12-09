@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <title>Employee Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        .sidebar {
+            width: 290px;
+            height: 100vh;
+            background-color: #6f42c1;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .logo-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 2rem;
+            background-color: #fff;
+            color: #6f42c1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .brand-name {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .menu-item:hover {
+            background-color: #5a36a3;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .menu-item span {
+            flex: 1;
+        }
+
+        .submenu {
+            display: none;
+            flex-direction: column;
+            margin-left: 20px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item {
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .submenu-item:hover {
+            color: #fff;
+        }
+
+        .has-submenu {
+            cursor: pointer;
+        }
+
+        .submenu.show {
+            display: flex;
+        }
+
+        .main-content {
+            margin-left: 290px;
+         padding-left: 100px;
+            width: calc(100% - 290px);
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            color: black;
+            background-color: white;
+            padding: 5px 8px;
+            border-radius: 5px;
+        }
+
+        .close-icon {
+            display: none;
+            font-size: 1.8rem;
+            color: #ffffff;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 480px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 80%;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .hamburger {
+                display: block;
+                top:20px;
+            }
+
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
+
+        .main-content {
+            margin-left: 290px;
+            padding: 20px;
+            width: calc(100% - 290px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 40px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+.bottom-icon {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottom-icon i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.bottom-icon i:hover {
+    color: #ddd;
+}
+
+        .employee-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .employee-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .employee-header {
+            display: flex;
+            margin-bottom: 15px;
+        }
+
+        .employee-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .employee-name {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .employee-role {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .role-designer {
+            background-color: #f3e8ff;
+            color: #6f42c1;
+        }
+
+        .role-qa {
+            background-color: #e6f4ea;
+            color: #137333;
+        }
+
+        .role-developer {
+            background-color: #fff0e0;
+            color: #b93815;
+        }
+
+        .employee-description {
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .employee-stats {
+            display: flex;
+            justify-content: flex-start;
+            gap: 30px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-icon {
+            font-size: 20px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .employee-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .employee-actions .btn {
+            flex: 1;
+        }
+        .employee-actions a
+        {
+          text-decoration:   none;
+        }
+       
+   
+
+    /* Updated and New Responsive Styles */
+    @media (max-width: 1024px) {
+        .employee-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        }
+    }
+
+    @media (max-width: 768px) {
+        .sidebar {
+            transform: translateX(-100%);
+            width: 80%;
+        }
+
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .search-container {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .search-container input {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .hamburger {
+            top: 10px;
+            left: 10px;
+        }
+
+        .main-content {
+            margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+        }
+        .search-container {
+                width: 70%;
+               
+            left:50px;
+            }
+
+        .header {
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .actions {
+             display: flex;
+        flex-direction: row;
+            gap: 10px;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .employee-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .employee-card {
+            padding: 15px;
+        }
+
+        .employee-header {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .employee-avatar {
+            width: 80px;
+            height: 80px;
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .employee-name {
+            font-size: 16px;
+        }
+
+        .employee-role {
+            font-size: 11px;
+        }
+
+        .employee-description {
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .employee-stats {
+            justify-content: space-around;
+            gap: 10px;
+        }
+
+        .stat-item {
+            flex: 1;
+        }
+
+        .stat-icon {
+            font-size: 16px;
+        }
+
+        .stat-value {
+            font-size: 16px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+        }
+
+        .employee-actions {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .employee-actions .btn {
+            width: 100%;
+        }
+    }
+
+.submenu {
+    display: none;
+    flex-direction: column;
+    
+    margin-left: 20px;
+    padding-left: 20px;
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.submenu-item {
+    padding: 10px 0;
+    font-size: 0.9rem;
+    color: #ddd;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.submenu-item:hover {
+    color: #fff;
+}
+
+.has-submenu {
+    cursor: pointer;
+}
+
+.submenu.show {
+    display: flex;
+}
+</style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="hamburger" id="hamburger">
+        <i class="fas fa-bars"></i>
+    </div>
+
+    <div class="sidebar" id="sidebar">
+        <div class="close-icon" id="closeIcon">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="logo-section">
+            <div class="logo">
+                <i class="fas fa-clipboard"></i>
+            </div>
+            <h2 class="brand-name">My-Task</h2>
+        </div>
+        <nav class="menu">
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-briefcase"></i> <span>Projects</span></a>
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-users"></i> <span>Our Clients</span></a>
+            <a href="#" class="menu-item has-submenu">
+                <i class="fas fa-user"></i> <span>Employees</span>
+                <i class="fas fa-chevron-down submenu-icon"></i>
+            </a>
+            <div class="submenu">
+                <a href="index.html" class="submenu-item" onclick="toggleMenu()">Members</a>
+                <a href="profile.html" class="submenu-item" onclick="toggleMenu()">Members Profile</a>
+                <a href="attandance.html" class="submenu-item" onclick="toggleMenu()">Attendance</a>
+                <a href="Leave .html" class="submenu-item" onclick="toggleMenu()">Leave Request</a>
+                <a href="Department.html" class="submenu-item" onclick="toggleMenu()">Department</a>
+                <a href="salary.html" class="submenu-item" onclick="toggleMenu()">Salary</a>
+            </div>
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-book"></i> <span>Accounts</span></a>
+            <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-dollar-sign"></i> <span>Payroll</span></a>
+        </nav>
+        <div class="bottom-icon">
+            <i class="fas fa-ellipsis-h"></i>
+        </div>
+    </div>
+<!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <header class="header">
+                <div class="search-container">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Search">
+                </div>
+               
+                <div class="user-actions">
+                    <i class="fas fa-bell"></i>
+                    <i class="fas fa-user-circle"></i>
+                </div>  
+                </div>
+            </header>
+
+            <h1>Employee</h1>
+
+            <div class="actions">
+                <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Employee</button>
+                <button class="btn btn-secondary">Status <i class="fas fa-chevron-down"></i></button>
+            </div>
+
+            <div class="employee-grid">
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-1.jpg" alt="Luke Short" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Luke Short</div>
+                            <span class="employee-role role-designer">UI/UX Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">4.5</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                      <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                       <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-2.jpg" alt="Lillian Powell" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Lillian Powell</div>
+                            <span class="employee-role role-qa">Quality Assurance</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">00</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                
+            <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">00</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">00</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-3.jpg" alt="Rachel Parsons" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Rachel Parsons</div>
+                            <span class="employee-role role-designer">Website Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-2.jpg" alt="Rachel Parsons" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Rachel Parsons</div>
+                            <span class="employee-role role-designer">Website Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-3.jpg" alt="Rachel Parsons" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Rachel Parsons</div>
+                            <span class="employee-role role-designer">Website Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-1.jpg" alt="Rachel Parsons" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Rachel Parsons</div>
+                            <span class="employee-role role-designer">Website Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-3.jpg" alt="Rachel Parsons" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">Rachel Parsons</div>
+                            <span class="employee-role role-designer">Website Designer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">10</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">04</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">15</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                        <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+
+                <div class="employee-card">
+                    <div class="employee-header">
+                        <img src="images/performer-2.jpg" alt="John Hardacre" class="employee-avatar">
+                        <div>
+                            <div class="employee-name">John Hardacre</div>
+                            <span class="employee-role role-developer">Developer</span>
+                        </div>
+                    </div>
+                    <p class="employee-description">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.Vestibulum ante ipsum primis in faucibus orci luctus et ultrices</p>
+                    <div class="employee-stats">
+                        <div class="stat-item">
+                            <i class="fas fa-tasks stat-icon"></i>
+                            <div class="stat-value">12</div>
+                            <div class="stat-label">Tasks</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-star stat-icon"></i>
+                            <div class="stat-value">03</div>
+                            <div class="stat-label">Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-project-diagram stat-icon"></i>
+                            <div class="stat-value">25</div>
+                            <div class="stat-label">Projects</div>
+                        </div>
+                    </div>
+                    <div class="employee-actions">
+                        <a href="profile.html"><button class="btn btn-primary">Profile</button></a>  
+                       <a href="#" ><button class="btn btn-secondary">Add Task </button></a>
+                    </div>
+                </div>
+            </div>
+
+    </div>
+
+    <script>
+        const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeIcon = document.getElementById('closeIcon');
+        const body = document.body;
+
+        function showMenu() {
+            sidebar.classList.add('open');
+            body.classList.add('sidebar-open');
+            closeIcon.style.display = 'block';
+        }
+
+        function hideMenu() {
+            sidebar.classList.remove('open');
+            body.classList.remove('sidebar-open');
+            closeIcon.style.display = 'none';
+        }
+
+        hamburger.addEventListener('click', showMenu);
+        closeIcon.addEventListener('click', hideMenu);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.has-submenu').forEach(menuItem => {
+                menuItem.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const submenu = menuItem.nextElementSibling;
+                    submenu.classList.toggle('show');
+                });
+            });
+        });
+
+        function toggleMenu() {
+    sidebar.classList.toggle('open');
+    body.classList.toggle('sidebar-open');
+    closeIcon.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+}
+    </script>
+</body>
+</html>

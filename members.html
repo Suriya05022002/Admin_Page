@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced HR Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+       :root {
+    --primary-color: #4a90e2; /* Vibrant blue */
+    --secondary-color: #50c878; /* Emerald green */
+    --accent-color: #ff6b6b; /* Coral red */
+    --background-color: #f8f9fa; /* Light gray background */
+    --card-background: #ffffff; /* White card background */
+    --text-primary: #333333; /* Dark gray for primary text */
+    --text-secondary: #666666; /* Medium gray for secondary text */
+    --heading-color: #3a0ca3; /* Deep purple for headings */
+    --sidebar-background: #6f42c1; /* Keep sidebar color unchanged */
+}
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 30px;
+            transition: margin-left 0.3s ease-in-out;
+        }
+
+.bottom-icon {
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.bottom-icon i {
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.bottom-icon i:hover {
+    color: #ddd;
+}
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+       
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 25px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover h2::after {
+            transform: translateX(0);
+        }
+
+        .employees-chart {
+            height: 300px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .employees-chart:hover {
+            transform: scale(1.02);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
+        .metric-card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px) rotate(2deg);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .metric-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover .metric-icon {
+            transform: scale(1.1);
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            transition: color 0.3s ease;
+        }
+
+        .metric-card:hover .metric-value {
+            color: var(--secondary-color);
+        }
+
+        .metric-label {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .gender-diversity {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .gender-chart {
+            width: 150px;
+            height: 150px;
+        }
+
+        .gender-stats {
+            text-align: center;
+        }
+
+        .gender-stats p {
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .gender-stats .male {
+            color: var(--primary-color);
+        }
+
+        .gender-stats .female {
+            color: var(--secondary-color);
+        }
+
+        .recent-activity {
+            margin-top: 30px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px) scale(1.02);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .activity-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 20px;
+            border: 2px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .activity-item:hover .activity-avatar {
+            transform: rotate(360deg);
+        }
+
+        .activity-details {
+            flex: 1;
+        }
+
+        .activity-name {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .activity-action {
+            color: var(--text-secondary);
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-left: 15px;
+        }
+
+        .top-performers {
+            background-color: #f3f4f6;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .performers-grid {
+            display: flex;
+            overflow-x: auto;
+            gap: 20px;
+            padding-bottom: 15px;
+        }
+
+        .performer-card {
+            background-color: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            min-width: 200px;
+            flex: 0 0 auto;
+        }
+
+        .performer-card:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .performer-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 3px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .performer-card:hover .performer-avatar {
+            transform: scale(1.1);
+        }
+
+        .performer-name {
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--primary-color);
+        }
+
+        .performer-position {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .performer-score {
+            color: var(--secondary-color);
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .performer-card:hover .performer-score {
+            color: var(--accent-color);
+        }
+
+        .announcements {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .announcement-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 15px 0;
+            transition: transform 0.3s ease;
+        }
+
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+
+        .announcement-item:hover {
+            transform: translateX(10px);
+        }
+
+        .announcement-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .announcement-content {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .announcement-date {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .upcoming-events {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .event-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            transition: transform 0.3s ease;
+        }
+
+        .event-item:last-child {
+            border-bottom: none;
+        }
+
+        .event-item:hover {
+            transform: translateX(10px);
+        }
+
+        .event-date {
+            background-color: var(--primary-color);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+        }
+
+        .event-date-day {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .event-date-month {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .event-details {
+            flex: 1;
+        }
+
+        .event-title {
+            font-weight: bold;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .event-time {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .welcome-message {
+                margin-bottom: 10px;
+            }
+
+            .hamburger-menu {
+                display: block;
+                position: fixed;
+                top: 20px;
+                left: 20px;
+                z-index: 1001;
+                background-color: var(--primary-color);
+                color: #fff;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                cursor: pointer;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performers-grid {
+                flex-direction: column;
+            }
+
+            .performer-card {
+                width: 100%;
+            }
+
+            .gender-diversity {
+                flex-direction: column;
+            }
+
+            .gender-chart {
+                margin-bottom: 20px;
+            }
+        }  .sidebar {
+            width: 290px;
+            height: 100vh;
+            background-color: #6f42c1;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .logo-section {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .logo {
+            font-size: 2rem;
+            background-color: #fff;
+            color: #6f42c1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto;
+        }
+
+        .brand-name {
+            margin-top: 10px;
+            font-size: 1.2rem;
+        }
+
+        .menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-decoration: none;
+            color: #fff;
+        }
+
+        .menu-item:hover {
+            background-color: #5a36a3;
+        }
+
+        .menu-item i {
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+
+        .menu-item span {
+            flex: 1;
+        }
+
+        .submenu {
+            display: none;
+            flex-direction: column;
+            margin-left: 20px;
+            padding-left: 20px;
+            border-left: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .submenu-item {
+            padding: 10px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .submenu-item:hover {
+            color: #fff;
+        }
+
+        .has-submenu {
+            cursor: pointer;
+        }
+
+        .submenu.show {
+            display: flex;
+        }
+
+        .main-content {
+            margin-left: 290px;
+         padding-left: 100px;
+            width: calc(100% - 290px);
+            transition: margin-left 0.3s ease-in-out, width 0.3s ease-in-out;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1001;
+            color:black;
+            background-color: white;
+            padding: 5px 8px;
+            border-radius: 5px;
+        }
+
+        .close-icon {
+            display: none;
+            font-size: 1.8rem;
+            color: #ffffff;
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 480px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 80%;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .hamburger {
+                display: block;
+            }
+
+            body.sidebar-open {
+                overflow: hidden;
+            }
+        }
+
+        .main-content {
+            margin-left: 290px;
+            padding: 20px;
+            width: calc(100% - 290px);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 40px 10px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #888;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-primary {
+            background-color: #6f42c1;
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+
+        @media (max-width: 768px) {
+            
+            
+            .main-content {
+                margin-left: 60px;
+                width: calc(100% - 60px);
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .search-container {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+
+            .search-container input {
+                width: 100%;
+            }
+
+            .employee-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+   
+    </style>
+</head>
+<body>
+   <!-- Sidebar -->
+   <div class="hamburger" id="hamburger">
+    <i class="fas fa-bars"></i>
+</div>
+
+<div class="sidebar" id="sidebar">
+    <div class="close-icon" id="closeIcon">
+        <i class="fas fa-times"></i>
+    </div>
+    <div class="logo-section">
+        <div class="logo">
+            <i class="fas fa-clipboard"></i>
+        </div>
+        <h2 class="brand-name">My-Task</h2>
+    </div>
+    <nav class="menu">
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-home"></i> <span>Dashboard</span></a>
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-briefcase"></i> <span>Projects</span></a>
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-ticket-alt"></i> <span>Tickets</span></a>
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-users"></i> <span>Our Clients</span></a>
+        <a href="#" class="menu-item has-submenu">
+            <i class="fas fa-user"></i> <span>Employees</span>
+            <i class="fas fa-chevron-down submenu-icon"></i>
+        </a>
+        <div class="submenu">
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Members</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Members Profile</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Attendance Employees</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Attendance</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Leave Request</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Department</a>
+            <a href="#" class="submenu-item" onclick="toggleMenu()">Salary</a>
+        </div>
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-book"></i> <span>Accounts</span></a>
+        <a href="#" class="menu-item" onclick="toggleMenu()"><i class="fas fa-dollar-sign"></i> <span>Payroll</span></a>
+    </nav>
+    <div class="bottom-icon">
+        <i class="fas fa-ellipsis-h"></i>
+    </div>
+</div>
+       
+<div class="main-content">
+    <div class="container">
+        <header class="header">
+            <div class="search-container">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" placeholder="Search">
+            </div>
+           
+            <div class="user-actions">
+                <i class="fas fa-bell"></i>
+                <i class="fas fa-user-circle"></i>
+            </div>  
+            </div>
+        </header>
+
+        <h1>Employee</h1>
+
+        <div class="actions">
+            <button class="btn btn-primary"><i class="fas fa-plus"></i> Add Employee</button>
+            <button class="btn btn-secondary">Status <i class="fas fa-chevron-down"></i></button>
+        </div>
+        
+    
+               
+    
+        <div class="dashboard-grid">
+            <div class="card employees-info">
+                <h2>Employee Overview</h2>
+                <div class="employees-chart">
+                    <canvas id="employeesChart"></canvas>
+                </div>
+                <div class="gender-diversity">
+                    <div class="gender-chart">
+                        <canvas id="genderChart"></canvas>
+                    </div>
+                    <div class="gender-stats">
+                        <h3>Gender Diversity</h3>
+                        <p class="male">Male: 57%</p>
+                        <p class="female">Female: 43%</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card employee-metrics">
+                <h2>Today's Metrics</h2>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-user-check"></i></div>
+                        <div class="metric-value">92%</div>
+                        <div class="metric-label">Attendance</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-user-clock"></i></div>
+                        <div class="metric-value">17</div>
+                        <div class="metric-label">Late Arrivals</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-user-minus"></i></div>
+                        <div class="metric-value">8</div>
+                        <div class="metric-label">Absences</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <div class="metric-value">14</div>
+                        <div class="metric-label">Leave Requests</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <img src="https://i.pravatar.cc/50?img=1" alt="Sarah Johnson" class="activity-avatar">
+                        <div class="activity-details">
+                            <div class="activity-name">Sarah Johnson</div>
+                            <div class="activity-action">Submitted a leave request</div>
+                        </div>
+                        <div class="activity-time">2 hours ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://i.pravatar.cc/50?img=2" alt="Michael Chen" class="activity-avatar">
+                        <div class="activity-details">
+                            <div class="activity-name">Michael Chen</div>
+                            <div class="activity-action">Completed performance review</div>
+                        </div>
+                        <div class="activity-time">4 hours ago</div>
+                    </div>
+                    <div class="activity-item">
+                        <img src="https://i.pravatar.cc/50?img=3" alt="Emily Davis" class="activity-avatar">
+                        <div class="activity-details">
+                            <div class="activity-name">Emily Davis</div>
+                            <div class="activity-action">Updated personal information</div>
+                        </div>
+                        <div class="activity-time">Yesterday</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card top-performers">
+                <h2>Top Performers</h2>
+                <div class="performers-grid">
+                    <div class="performer-card">
+                        <img src="https://i.pravatar.cc/80?img=4" alt="Alex Turner" class="performer-avatar">
+                        <div class="performer-name">Alex Turner</div>
+                        <div class="performer-position">Sales Manager</div>
+                        <div class="performer-score">98%</div>
+                    </div>
+                    <div class="performer-card">
+                        <img src="https://i.pravatar.cc/80?img=5" alt="Sophia Lee" class="performer-avatar">
+                        <div class="performer-name">Sophia Lee</div>
+                        <div class="performer-position">UX Designer</div>
+                        <div class="performer-score">95%</div>
+                    </div>
+                    <div class="performer-card">
+                        <img src="https://i.pravatar.cc/80?img=6" alt="Daniel Kim" class="performer-avatar">
+                        <div class="performer-name">Daniel Kim</div>
+                        <div class="performer-position">Software Engineer</div>
+                        <div class="performer-score">93%</div>
+                    </div>
+                    <div class="performer-card">
+                        <img src="https://i.pravatar.cc/80?img=7" alt="Emma Watson" class="performer-avatar">
+                        <div class="performer-name">Emma Watson</div>
+                        <div class="performer-position">Marketing Specialist</div>
+                        <div class="performer-score">91%</div>
+                    </div>
+                    <div class="performer-card">
+                        <img src="https://i.pravatar.cc/80?img=8" alt="Ryan Garcia" class="performer-avatar">
+                        <div class="performer-name">Ryan Garcia</div>
+                        <div class="performer-position">Product Manager</div>
+                        <div class="performer-score">90%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card announcements">
+                <h2>Announcements</h2>
+                <div class="announcement-item">
+                    <div class="announcement-title">Company Picnic</div>
+                    <div class="announcement-content">Join us for our annual company picnic next Saturday!</div>
+                    <div class="announcement-date">Posted on: June 15, 2023</div>
+                </div>
+                <div class="announcement-item">
+                    <div class="announcement-title">New Health Insurance Plan</div>
+                    <div class="announcement-content">We're updating our health insurance. Check your email for details.</div>
+                    <div class="announcement-date">Posted on: June 10, 2023</div>
+                </div>
+                <div class="announcement-item">
+                    <div class="announcement-title">Office Renovation</div>
+                    <div class="announcement-content">The 3rd floor will be under renovation next week. Plan accordingly.</div>
+                    <div class="announcement-date">Posted on: June 5, 2023</div>
+                </div>
+            </div>
+
+            <div class="card upcoming-events">
+                <h2>Upcoming Events</h2>
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-date-day">20</div>
+                        <div class="event-date-month">Jun</div>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-title">Team Building Workshop</div>
+                        <div class="event-time">9:00 AM - 5:00 PM</div>
+                    </div>
+                </div>
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-date-day">25</div>
+                        <div class="event-date-month">Jun</div>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-title">Quarterly Review Meeting</div>
+                        <div class="event-time">2:00 PM - 4:00 PM</div>
+                    </div>
+                </div>
+                <div class="event-item">
+                    <div class="event-date">
+                        <div class="event-date-day">01</div>
+                        <div class="event-date-month">Jul</div>
+                    </div>
+                    <div class="event-details">
+                        <div class="event-title">New Employee Orientation</div>
+                        <div class="event-time">10:00 AM - 12:00 PM</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Employees Chart
+        const employeesCtx = document.getElementById('employeesChart').getContext('2d');
+        new Chart(employeesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Number of Employees',
+                    data: [400, 420, 415, 430, 450, 460],
+                    borderColor: '#6f42c1',
+                    backgroundColor: 'rgba(111, 66, 193, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 350
+                    }
+                }
+            }
+        });
+
+        // Gender Diversity Chart
+        const genderCtx = document.getElementById('genderChart').getContext('2d');
+        new Chart(genderCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Male', 'Female'],
+                datasets: [{
+                    data: [57, 43],
+                    backgroundColor: ['#6f42c1', '#8c68d1']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        
+
+            // Close sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 768 && !sidebar.contains(e.target) && e.target !== hamburgerMenu) {
+                    sidebar.classList.remove('open');
+                    body.classList.remove('sidebar-open');
+                }
+            });
+
+           
+
+            // Enhanced animations for cards
+            const cards = document.querySelectorAll('.card');
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            cards.forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = `opacity 0.5s ease, transform 0.5s ease ${index * 0.1}s`;
+                observer.observe(card);
+            });
+
+            // Animate metric cards on hover
+            const metricCards = document.querySelectorAll('.metric-card');
+            metricCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.querySelector('.metric-icon').style.transform = 'scale(1.1) rotate(10deg)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.querySelector('.metric-icon').style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+
+            // Animate performer cards on hover
+            const performerCards = document.querySelectorAll('.performer-card');
+            performerCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.querySelector('.performer-avatar').style.transform = 'scale(1.1) rotate(5deg)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.querySelector('.performer-avatar').style.transform = 'scale(1) rotate(0deg)';
+                });
+            });
+
+            // Animate activity items on hover
+            const activityItems = document.querySelectorAll('.activity-item');
+            activityItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateX(10px) scale(1.02)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateX(0) scale(1)';
+                });
+            });
+
+            // Animate announcement items on hover
+            const announcementItems = document.querySelectorAll('.announcement-item');
+            announcementItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateX(10px)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateX(0)';
+                });
+            });
+
+            // Animate event items on hover
+            const eventItems = document.querySelectorAll('.event-item');
+            eventItems.forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    item.style.transform = 'translateX(10px)';
+                    item.querySelector('.event-date').style.transform = 'scale(1.1)';
+                });
+                item.addEventListener('mouseleave', () => {
+                    item.style.transform = 'translateX(0)';
+                    item.querySelector('.event-date').style.transform = 'scale(1)';
+                });
+            });
+        
+
+         const hamburger = document.getElementById('hamburger');
+        const sidebar = document.getElementById('sidebar');
+        const closeIcon = document.getElementById('closeIcon');
+        const body = document.body;
+
+        function showMenu() {
+            sidebar.classList.add('open');
+            body.classList.add('sidebar-open');
+            closeIcon.style.display = 'block';
+        }
+
+        function hideMenu() {
+            sidebar.classList.remove('open');
+            body.classList.remove('sidebar-open');
+            closeIcon.style.display = 'none';
+        }
+
+        hamburger.addEventListener('click', showMenu);
+        closeIcon.addEventListener('click', hideMenu);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.has-submenu').forEach(menuItem => {
+                menuItem.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const submenu = menuItem.nextElementSibling;
+                    submenu.classList.toggle('show');
+                });
+            });
+        });
+
+        function toggleMenu() {
+    sidebar.classList.toggle('open');
+    body.classList.toggle('sidebar-open');
+    closeIcon.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+}
+
+
+
+
+    </script>
+</body>
+</html>
+
